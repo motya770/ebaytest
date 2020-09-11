@@ -2,6 +2,7 @@ package com.ebay.demo.repository;
 
 import com.ebay.demo.model.Auction;
 import com.ebay.demo.model.EbayItem;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -28,4 +29,6 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
     @Modifying
     @Query("delete from Auction a where a.ebayItem.id = :fromTime")
     List<Auction> deleteByFromTime(@Param(value = "fromTime") Date fromTime);
+
+    List<Auction> findByFromTimeGreaterThanOrderByFromTimeAsc(Date fromTime, Pageable pageable);
 }

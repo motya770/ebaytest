@@ -7,8 +7,12 @@ import com.ebay.demo.repository.AuctionRepository;
 import com.ebay.demo.repository.EbayItemRepository;
 import com.ebay.demo.service.IAuctionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,6 +40,12 @@ public class AuctionService implements IAuctionService {
     @Override
     public List<Auction> removeByFromTime(Date fromTime) {
         return auctionRepository.deleteByFromTime(fromTime);
+    }
+
+    @Override
+    public List<Auction> getNextAuctions() {
+        return auctionRepository.findByFromTimeGreaterThanOrderByFromTimeAsc(Calendar.getInstance().getTime(),
+                PageRequest.of(0, 100));
     }
 
     @Override

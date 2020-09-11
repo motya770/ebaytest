@@ -17,21 +17,23 @@ public class AuctionController {
     private IAuctionService auctionService;
 
     @PostMapping(value = "/set-auction")
-    public Auction setAuction(Date fromTime, Date toTime, String itemId) {
-        return null;
+    public Auction setAuction(@RequestParam Date fromTime,
+                              @RequestParam Date toTime,
+                              @RequestParam String itemId) {
+        return auctionService.createAuction(fromTime, toTime, itemId);
     }
 
+    //TODO fix and think
     @PostMapping(value = "/remove")
-    public Auction removeAuction(Date fromTime, String itemId) {
-        return null;
+    public Auction removeAuction(@RequestParam Date fromTime,
+                                 @RequestParam String itemId) {
+        return auctionService.removeByEbayItemId(itemId);
     }
 
     @GetMapping(value = "/get-next")
     public List<Auction> getNexAuction() {
-        return null;
+        return auctionService.getNextAuctions();
     }
-
-
 
 
     //    1. Set Auction - with parameters fromTime, toTime, itemId.

@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface IAuctionService {
 
+    List<Auction> getNextAuctions();
+
     List<Auction> removeByFromTime(Date fromTime);
 
     Auction removeByEbayItemId(String itemId);
