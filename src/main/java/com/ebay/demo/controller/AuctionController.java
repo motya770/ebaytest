@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -17,15 +18,15 @@ public class AuctionController {
     private IAuctionService auctionService;
 
     @PostMapping(value = "/set-auction")
-    public Auction setAuction(@RequestParam Date fromTime,
-                              @RequestParam Date toTime,
+    public Auction setAuction(@RequestParam LocalDateTime fromTime,
+                              @RequestParam LocalDateTime toTime,
                               @RequestParam String itemId) {
         return auctionService.createAuction(fromTime, toTime, itemId);
     }
 
     //TODO fix and think
     @PostMapping(value = "/remove")
-    public Auction removeAuction(@RequestParam Date fromTime,
+    public Auction removeAuction(@RequestParam LocalDateTime fromTime,
                                  @RequestParam String itemId) {
         return auctionService.removeByEbayItemId(itemId);
     }

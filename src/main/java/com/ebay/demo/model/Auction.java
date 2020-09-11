@@ -3,6 +3,7 @@ package com.ebay.demo.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -14,12 +15,11 @@ public class Auction {
     private Long id;
 
     @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date fromTime;
+    private LocalDateTime fromTime;
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    private Date toTime;
+    private LocalDateTime toTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private EbayItem ebayItem;

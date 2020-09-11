@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -19,8 +19,8 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
     @Query(" select a from Auction a where (a.fromTime <= :toTime and a.toTime >= :toTime)" +
             " or (a.fromTime <= :fromTime and a.toTime >= :fromTime ) " +
             " or (a.fromTime >= :fromTime and a.toTime <= :toTime ) and a.ebayItem.id = :#{#ebayItem.id} ")
-    List<Auction> findOverlapping(@Param(value = "fromTime") Date fromTime,
-                                  @Param(value = "toTime") Date toTime,
+    List<Auction> findOverlapping(@Param(value = "fromTime") LocalDateTime fromTime,
+                                  @Param(value = "toTime") LocalDateTime toTime,
                                   @Param(value = "ebayItem") EbayItem ebayItem);
     @Modifying
     @Query("delete from Auction a where a.ebayItem.id = :itemId")
@@ -28,7 +28,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
     @Modifying
     @Query("delete from Auction a where a.ebayItem.id = :fromTime")
-    List<Auction> deleteByFromTime(@Param(value = "fromTime") Date fromTime);
+    List<Auction> deleteByFromTime(@Param(value = "fromTime") LocalDateTime fromTime);
 
-    List<Auction> findByFromTimeGreaterThanOrderByFromTimeAsc(Date fromTime, Pageable pageable);
+    List<Auction> findByFromTimeGreaterThanOrderByFromTimeAsc(LocalDateTime fromTime, Pageable pageable);
 }

@@ -12,6 +12,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -32,40 +34,34 @@ public class AuctionService implements IAuctionService {
         return auctionRepository.findOverlapping(auction.getFromTime(), auction.getToTime(), ebayItem);
     }
 
-    @Override
-    public Auction removeByEbayItemId(String itemId) {
-        return auctionRepository.deleteByEbayItemId(itemId);
-    }
 
+//     5. An auction cannot last for more than 3 hours, and for less than 15 minutes.
+//     6. No auctions on Mondays.
+//     7. No auctions at night (from 11:00 P.M. to 8:00 A.M).
+//     8. No more than 8 hours of auctions total per day.
+//     9. No more than 40 hours of auctions total per week.
     @Override
-    public List<Auction> removeByFromTime(Date fromTime) {
-        return auctionRepository.deleteByFromTime(fromTime);
-    }
+    public void validateAuctionTimes(Auction auction) {
 
-    @Override
-    public List<Auction> getNextAuctions() {
-        return auctionRepository.findByFromTimeGreaterThanOrderByFromTimeAsc(Calendar.getInstance().getTime(),
-                PageRequest.of(0, 100));
-    }
+        LocalDateTime fromTime = auction.getFromTime();
+        LocalDateTime toTime = auction.getToTime();
 
-    @Override
-    public Auction createAuction(Date fromTime, Date toTime, String itemId) {
-
-        if(fromTime.compareTo(toTime) >= 0){
+        Duration auctionDuration = Duration.between(fromTime, toTime);
+        if(auctionDuration.isNegative() || auctionDuration.isZero()){
             throw new AuctionException("Can't create auction: start time is greater than end time");
         }
 
-        EbayItem ebayItem = ebayItemRepository.findById(itemId).get();
-        if(ebayItem==null){
-            throw new AuctionException("Can't create auction: Ebay item " + itemId + " not found");
+        if(auctionDuration.compareTo(Duration.ofHours(3))>0){
+            throw new AuctionException("Can't create auction: auction lasts more than 3 hours");
         }
 
-        Auction auction = new Auction();
-        auction.setFromTime(fromTime);
-        auction.setToTime(toTime);
-        auction.setEbayItem(ebayItem);
+        if(auctionDuration.compareTo(Duration.ofMinutes(15))<=0){
+            throw new AuctionException("Can't create auction: auction lasts less than 15 minutes");
+        }
 
-        List<Auction> overlappingAuctions = findOverlapping(auction, ebayItem);
+
+
+        List<Auction> overlappingAuctions = findOverlapping(auction, auction.getEbayItem());
 
         if(overlappingAuctions.size()>0){
 
@@ -77,6 +73,40 @@ public class AuctionService implements IAuctionService {
             throw new AuctionException("Can't create auction: Found overlapping auctions: { "
                     + overlappingIds + " }");
         }
+
+
+    }
+
+    @Override
+    public Auction removeByEbayItemId(String itemId) {
+        return auctionRepository.deleteByEbayItemId(itemId);
+    }
+
+    @Override
+    public List<Auction> removeByFromTime(LocalDateTime fromTime) {
+        return auctionRepository.deleteByFromTime(fromTime);
+    }
+
+    @Override
+    public List<Auction> getNextAuctions() {
+        return auctionRepository.findByFromTimeGreaterThanOrderByFromTimeAsc(LocalDateTime.now(),
+                PageRequest.of(0, 100));
+    }
+
+    @Override
+    public Auction createAuction(LocalDateTime fromTime, LocalDateTime toTime, String itemId) {
+
+        Auction auction = new Auction();
+        auction.setFromTime(fromTime);
+        auction.setToTime(toTime);
+
+        EbayItem ebayItem = ebayItemRepository.findById(itemId).get();
+        if(ebayItem==null){
+            throw new AuctionException("Can't create auction: Ebay item " + itemId + " not found");
+        }
+        auction.setEbayItem(ebayItem);
+
+        validateAuctionTimes(auction);
 
         return auctionRepository.save(auction);
     }
