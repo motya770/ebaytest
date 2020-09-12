@@ -17,7 +17,6 @@ public class Auction {
     private LocalDateTime fromTime;
 
     @Column
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime toTime;
 
     @ManyToOne(fetch = FetchType.LAZY)

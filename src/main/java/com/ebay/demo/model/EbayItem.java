@@ -13,8 +13,8 @@ public class EbayItem {
     @Id
     private String id;
 
-    @Column
-    private String itemName;
+    //@Column
+    //private String itemName;
 
     @JsonIgnore
     @OneToMany(mappedBy = "ebayItem", fetch = FetchType.LAZY)

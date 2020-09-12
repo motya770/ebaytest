@@ -33,10 +33,10 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
     //used native query because we are using
     @Query(nativeQuery = true,
             value =
-            " select SUM(EXTRACT(MILLISECOND FROM a.fromTime) - " +
-                    " EXTRACT(MILLISECOND FROM a.toTime)) from Auction a " +
-                    " where a.fromTime >= :fromTime and a.toTime <= :toTime ")
-    long getTotalTimeFrameSum(@Param(value = "fromTime") LocalDateTime fromTime,
+            " select SUM(EXTRACT(MILLISECOND FROM a.from_time) - " +
+                    " EXTRACT(MILLISECOND FROM a.to_time)) from Auction a " +
+                    " where a.from_time >= :fromTime and a.to_time <= :toTime ")
+    Long getTotalTimeFrameSum(@Param(value = "fromTime") LocalDateTime fromTime,
                               @Param(value = "toTime") LocalDateTime toTime);
 
     List<Auction> findByFromTimeGreaterThanOrderByFromTimeAsc(LocalDateTime fromTime, Pageable pageable);

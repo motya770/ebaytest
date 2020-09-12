@@ -4,5 +4,5 @@ import com.ebay.demo.model.EbayItem;
 
 public interface IEbayItemService {
 
-    EbayItem createEbayItem(String uuid, String name);
+    EbayItem createEbayItem(String uuid);
 }

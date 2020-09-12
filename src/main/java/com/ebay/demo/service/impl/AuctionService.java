@@ -6,19 +6,24 @@ import com.ebay.demo.model.EbayItem;
 import com.ebay.demo.repository.AuctionRepository;
 import com.ebay.demo.repository.EbayItemRepository;
 import com.ebay.demo.service.IAuctionService;
+import com.ebay.demo.service.IEbayItemService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Transactional
 @Service
 public class AuctionService implements IAuctionService {
@@ -28,6 +33,9 @@ public class AuctionService implements IAuctionService {
 
     @Autowired
     private EbayItemRepository ebayItemRepository;
+
+    @Autowired
+    private IEbayItemService ebayItemService;
 
     @Override
     public List<Auction> findOverlapping(Auction auction, EbayItem ebayItem) {
@@ -59,12 +67,7 @@ public class AuctionService implements IAuctionService {
             throw new AuctionException("Can't create auction: auction lasts less than 15 minutes");
         }
 
-        if(fromTime.getDayOfWeek() == DayOfWeek.MONDAY || toTime.getDayOfWeek() == toTime.getDayOfWeek()){
-            throw new AuctionException("Can't create auction: No auctions on Mondays. ");
-        }
-
-
-        if(fromTime.getDayOfWeek() == DayOfWeek.MONDAY || toTime.getDayOfWeek() == toTime.getDayOfWeek()){
+        if(fromTime.getDayOfWeek() == DayOfWeek.MONDAY || toTime.getDayOfWeek() == DayOfWeek.MONDAY){
             throw new AuctionException("Can't create auction: No auctions on Mondays. ");
         }
 
@@ -97,7 +100,11 @@ public class AuctionService implements IAuctionService {
         LocalDateTime lastDayOfTheWeek = today.with(DayOfWeek.SUNDAY);
         LocalDateTime lastDayOfTheWeekAndLastHour  = LocalDateTime.of(lastDayOfTheWeek.toLocalDate(), LocalTime.MAX);
 
-        long millTotalForWeekSum = auctionRepository.getTotalTimeFrameSum(firstDayOfTheWeek, lastDayOfTheWeekAndLastHour);
+        Long millTotalForWeekSum = auctionRepository.getTotalTimeFrameSum(firstDayOfTheWeek, lastDayOfTheWeekAndLastHour);
+        if(millTotalForWeekSum==null){
+            return;
+        }
+
         Duration maxDuration =  Duration.ofHours(40);
         Duration totalSumWeekDuration = Duration.of(millTotalForWeekSum, ChronoUnit.MILLIS);
 
@@ -111,8 +118,10 @@ public class AuctionService implements IAuctionService {
         LocalDateTime startOfToday = LocalDateTime.of(today.toLocalDate(), LocalTime.MIDNIGHT);
         LocalDateTime endOfToday  = LocalDateTime.of(today.toLocalDate(), LocalTime.MAX);
 
-        long millTotalSum = auctionRepository.getTotalTimeFrameSum(startOfToday, endOfToday);
-
+        Long millTotalSum = auctionRepository.getTotalTimeFrameSum(startOfToday, endOfToday);
+        if(millTotalSum==null){
+            return;
+        }
         Duration hoursDuration =  Duration.ofHours(8);
         Duration totalSumTodayDuration = Duration.of(millTotalSum, ChronoUnit.MILLIS);
 
@@ -144,10 +153,14 @@ public class AuctionService implements IAuctionService {
         auction.setFromTime(fromTime);
         auction.setToTime(toTime);
 
-        EbayItem ebayItem = ebayItemRepository.findById(itemId).get();
-        if(ebayItem==null){
-            throw new AuctionException("Can't create auction: Ebay item " + itemId + " not found");
+        EbayItem ebayItem = null;
+        Optional<EbayItem> ebayItemOptional = ebayItemRepository.findById(itemId);
+        if(ebayItemOptional.isEmpty()){
+            ebayItem = ebayItemService.createEbayItem(itemId);
+        }else {
+            ebayItem = ebayItemOptional.get();
         }
+
         auction.setEbayItem(ebayItem);
 
         validateAuctionTimes(auction);

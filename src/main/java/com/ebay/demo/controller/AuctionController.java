@@ -3,6 +3,7 @@ package com.ebay.demo.controller;
 import com.ebay.demo.model.Auction;
 import com.ebay.demo.service.IAuctionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -16,8 +17,8 @@ public class AuctionController {
     private IAuctionService auctionService;
 
     @PostMapping(value = "/set-auction")
-    public Auction setAuction(@RequestParam LocalDateTime fromTime,
-                              @RequestParam LocalDateTime toTime,
+    public Auction setAuction(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  LocalDateTime fromTime,
+                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toTime,
                               @RequestParam String itemId) {
         return auctionService.createAuction(fromTime, toTime, itemId);
     }
