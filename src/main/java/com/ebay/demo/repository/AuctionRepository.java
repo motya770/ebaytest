@@ -30,5 +30,14 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
     @Query("delete from Auction a where a.ebayItem.id = :fromTime")
     List<Auction> deleteByFromTime(@Param(value = "fromTime") LocalDateTime fromTime);
 
+    //used native query because we are using
+    @Query(nativeQuery = true,
+            value =
+            " select SUM(EXTRACT(MILLISECOND FROM a.fromTime) - " +
+                    " EXTRACT(MILLISECOND FROM a.toTime)) from Auction a " +
+                    " where a.fromTime >= :fromTime and a.toTime <= :toTime ")
+    long getTotalTimeFrameSum(@Param(value = "fromTime") LocalDateTime fromTime,
+                              @Param(value = "toTime") LocalDateTime toTime);
+
     List<Auction> findByFromTimeGreaterThanOrderByFromTimeAsc(LocalDateTime fromTime, Pageable pageable);
 }

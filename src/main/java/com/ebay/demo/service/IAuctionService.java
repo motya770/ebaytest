@@ -4,7 +4,6 @@ import com.ebay.demo.model.Auction;
 import com.ebay.demo.model.EbayItem;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 public interface IAuctionService {

@@ -12,8 +12,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -59,10 +63,26 @@ public class AuctionService implements IAuctionService {
             throw new AuctionException("Can't create auction: auction lasts less than 15 minutes");
         }
 
+        if(fromTime.getDayOfWeek() == DayOfWeek.MONDAY || toTime.getDayOfWeek() == toTime.getDayOfWeek()){
+            throw new AuctionException("Can't create auction: No auctions on Mondays. ");
+        }
 
 
+        if(fromTime.getDayOfWeek() == DayOfWeek.MONDAY || toTime.getDayOfWeek() == toTime.getDayOfWeek()){
+            throw new AuctionException("Can't create auction: No auctions on Mondays. ");
+        }
+
+        if(fromTime.getHour() >= 23 || toTime.getHour()<=8){
+            throw new AuctionException("Can't create auction: No auctions at night (from 11:00 P.M. to 8:00 A.M). ");
+        }
+
+        checkLimitPerDay();
+        checkLimitPerWeek();
+        checkOverlappingTimes(auction);
+    }
+
+    private void checkOverlappingTimes(Auction auction) {
         List<Auction> overlappingAuctions = findOverlapping(auction, auction.getEbayItem());
-
         if(overlappingAuctions.size()>0){
 
             //building string with auction's ids
@@ -73,8 +93,36 @@ public class AuctionService implements IAuctionService {
             throw new AuctionException("Can't create auction: Found overlapping auctions: { "
                     + overlappingIds + " }");
         }
+    }
 
+    private void checkLimitPerWeek() {
+        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime firstDayOfTheWeek = today.with(DayOfWeek.MONDAY);
+        LocalDateTime lastDayOfTheWeek = today.with(DayOfWeek.SUNDAY);
+        LocalDateTime lastDayOfTheWeekAndLastHour  = LocalDateTime.of(lastDayOfTheWeek.toLocalDate(), LocalTime.MAX);
 
+        long millTotalForWeekSum = auctionRepository.getTotalTimeFrameSum(firstDayOfTheWeek, lastDayOfTheWeekAndLastHour);
+        Duration maxDuration =  Duration.ofHours(40);
+        Duration totalSumWeekDuration = Duration.of(millTotalForWeekSum, ChronoUnit.MILLIS);
+
+        if(maxDuration.compareTo(totalSumWeekDuration) <= 0){
+            throw new AuctionException("Can't create auction: No more than 40 hours of auctions total per week..");
+        }
+    }
+
+    private void checkLimitPerDay() {
+        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime startOfToday = LocalDateTime.of(today.toLocalDate(), LocalTime.MIDNIGHT);
+        LocalDateTime endOfToday  = LocalDateTime.of(today.toLocalDate(), LocalTime.MAX);
+
+        long millTotalSum = auctionRepository.getTotalTimeFrameSum(startOfToday, endOfToday);
+
+        Duration hoursDuration =  Duration.ofHours(8);
+        Duration totalSumTodayDuration = Duration.of(millTotalSum, ChronoUnit.MILLIS);
+
+        if(hoursDuration.compareTo(totalSumTodayDuration) <= 0){
+            throw new AuctionException("Can't create auction: No more than 8 hours of auctions total per day.");
+        }
     }
 
     @Override
