@@ -56,27 +56,27 @@ public class AuctionService implements IAuctionService {
 
         Duration auctionDuration = Duration.between(fromTime, toTime);
         if(auctionDuration.isNegative() || auctionDuration.isZero()){
-            throw new AuctionException("Can't create auction: start time is greater than end time");
+            throw new AuctionException("Can't create auction: start time is greater than end time. ItemId " + auction.getEbayItem().getId());
         }
 
         if(auctionDuration.compareTo(Duration.ofHours(3))>0){
-            throw new AuctionException("Can't create auction: auction lasts more than 3 hours");
+            throw new AuctionException("Can't create auction: auction lasts more than 3 hours. ItemId " + auction.getEbayItem().getId());
         }
 
         if(auctionDuration.compareTo(Duration.ofMinutes(15))<=0){
-            throw new AuctionException("Can't create auction: auction lasts less than 15 minutes");
+            throw new AuctionException("Can't create auction: auction lasts less than 15 minutes. ItemId " + auction.getEbayItem().getId());
         }
 
         if(fromTime.getDayOfWeek() == DayOfWeek.MONDAY || toTime.getDayOfWeek() == DayOfWeek.MONDAY){
-            throw new AuctionException("Can't create auction: No auctions on Mondays. ");
+            throw new AuctionException("Can't create auction: No auctions on Mondays. ItemId " + auction.getEbayItem().getId());
         }
 
         if(fromTime.getHour() >= 23 || toTime.getHour()<=8){
-            throw new AuctionException("Can't create auction: No auctions at night (from 11:00 P.M. to 8:00 A.M). ");
+            throw new AuctionException("Can't create auction: No auctions at night (from 11:00 P.M. to 8:00 A.M). ItemId " + auction.getEbayItem().getId());
         }
 
-        checkLimitPerDay();
-        checkLimitPerWeek();
+        checkLimitPerDay(auction);
+        checkLimitPerWeek(auction);
         checkOverlappingTimes(auction);
     }
 
@@ -94,7 +94,7 @@ public class AuctionService implements IAuctionService {
         }
     }
 
-    private void checkLimitPerWeek() {
+    private void checkLimitPerWeek(Auction auction) {
         LocalDateTime today = LocalDateTime.now();
         LocalDateTime firstDayOfTheWeek = today.with(DayOfWeek.MONDAY);
         LocalDateTime lastDayOfTheWeek = today.with(DayOfWeek.SUNDAY);
@@ -109,11 +109,11 @@ public class AuctionService implements IAuctionService {
         Duration totalSumWeekDuration = Duration.of(millTotalForWeekSum, ChronoUnit.MILLIS);
 
         if(maxDuration.compareTo(totalSumWeekDuration) <= 0){
-            throw new AuctionException("Can't create auction: No more than 40 hours of auctions total per week..");
+            throw new AuctionException("Can't create auction: No more than 40 hours of auctions total per week. ItemId " + auction.getEbayItem().getId());
         }
     }
 
-    private void checkLimitPerDay() {
+    private void checkLimitPerDay(Auction auction) {
         LocalDateTime today = LocalDateTime.now();
         LocalDateTime startOfToday = LocalDateTime.of(today.toLocalDate(), LocalTime.MIDNIGHT);
         LocalDateTime endOfToday  = LocalDateTime.of(today.toLocalDate(), LocalTime.MAX);
@@ -126,7 +126,7 @@ public class AuctionService implements IAuctionService {
         Duration totalSumTodayDuration = Duration.of(millTotalSum, ChronoUnit.MILLIS);
 
         if(hoursDuration.compareTo(totalSumTodayDuration) <= 0){
-            throw new AuctionException("Can't create auction: No more than 8 hours of auctions total per day.");
+            throw new AuctionException("Can't create auction: No more than 8 hours of auctions total per day. ItemId " + auction.getEbayItem().getId());
         }
     }
 
