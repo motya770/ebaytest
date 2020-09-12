@@ -29,6 +29,7 @@ public class RestResponseEntityExceptionHandler
         apiError.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         apiError.setMessage(ex.getMessage());
         apiError.setTime(LocalDateTime.now());
+        apiError.setExceptionType(ex.getClass().getTypeName());
 
         return handleExceptionInternal(ex, apiError,
                 new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);

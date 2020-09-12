@@ -16,6 +16,11 @@ public class AuctionController {
     @Autowired
     private IAuctionService auctionService;
 
+    //    1. Set Auction - with parameters fromTime, toTime, itemId.
+    //    2. Remove Auction - with parameter fromTime
+    //    3. Remove Auction - with parameter itemId
+    //    4. Get Next Auction - with no parameters
+
     @PostMapping(value = "/set-auction")
     public Auction setAuction(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)  LocalDateTime fromTime,
                               @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toTime,
@@ -36,8 +41,5 @@ public class AuctionController {
     }
 
 
-    //    1. Set Auction - with parameters fromTime, toTime, itemId.
-    //    2. Remove Auction - with parameter fromTime
-    //    3. Remove Auction - with parameter itemId
-    //    4. Get Next Auction - with no parameters
+
 }

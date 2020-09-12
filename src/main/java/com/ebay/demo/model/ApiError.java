@@ -10,4 +10,5 @@ public class ApiError {
     private HttpStatus status;
     private String message;
     private LocalDateTime time;
+    private String exceptionType;
 }

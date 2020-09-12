@@ -1,6 +1,8 @@
 package com.ebay.demo.service.impl;
 
 import com.ebay.demo.exception.AuctionException;
+import com.ebay.demo.exception.DayFullAuctionException;
+import com.ebay.demo.exception.WeekFullAuctionException;
 import com.ebay.demo.model.Auction;
 import com.ebay.demo.model.EbayItem;
 import com.ebay.demo.repository.AuctionRepository;
@@ -109,7 +111,7 @@ public class AuctionService implements IAuctionService {
         Duration totalSumWeekDuration = Duration.of(millTotalForWeekSum, ChronoUnit.MILLIS);
 
         if(maxDuration.compareTo(totalSumWeekDuration) <= 0){
-            throw new AuctionException("Can't create auction: No more than 40 hours of auctions total per week. ItemId " + auction.getEbayItem().getId());
+            throw new WeekFullAuctionException("Can't create auction: No more than 40 hours of auctions total per week. ItemId " + auction.getEbayItem().getId());
         }
     }
 
@@ -126,7 +128,7 @@ public class AuctionService implements IAuctionService {
         Duration totalSumTodayDuration = Duration.of(millTotalSum, ChronoUnit.MILLIS);
 
         if(hoursDuration.compareTo(totalSumTodayDuration) <= 0){
-            throw new AuctionException("Can't create auction: No more than 8 hours of auctions total per day. ItemId " + auction.getEbayItem().getId());
+            throw new DayFullAuctionException("Can't create auction: No more than 8 hours of auctions total per day. ItemId " + auction.getEbayItem().getId());
         }
     }
 
