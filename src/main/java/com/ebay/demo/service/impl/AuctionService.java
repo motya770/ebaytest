@@ -90,6 +90,7 @@ public class AuctionService implements IAuctionService {
         }
     }
 
+    //TODO fix overlapping more carefully
     private void checkOverlappingTimes(Auction auction) {
         List<Auction> overlappingAuctions = findOverlapping(auction, auction.getEbayItem());
         if(overlappingAuctions.size()>0){
