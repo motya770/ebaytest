@@ -1,6 +1,17 @@
+## program setup
 
+1) you need to git pull 3 project 
+a) ebayeuroka - discovery server 
+b) ebaydemo - auction service 
+c) ebaychecker - program that calls to auction service 
 
-## if you want to see swagger web interface 
+you should launch those applications (because of service discovery)
+in specific order - 
+<b>a</b> - than wait 10 seconds
+<b>b</b> - than wait 10 seconds 
+<c>c<c> - this is the program that creates auctions 
+
+## if you want to see swagger web interface of ebaydemo
 
 go to 
 http://localhost:8080/swagger-ui.html#
