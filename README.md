@@ -1,6 +1,6 @@
 ## program setup
 
-1) you need to git pull 3 project 
+1) you need to git pull 3 project <br/>
 a) ebayeuroka - discovery server https://github.com/motya770/ebayeuroka <br/>
 b) ebaydemo - auction service https://github.com/motya770/ebaytest <br/>
 c) ebaychecker - program that calls to auction service https://github.com/motya770/ebaychecker <br/>
