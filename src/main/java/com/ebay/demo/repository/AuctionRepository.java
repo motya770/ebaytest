@@ -18,7 +18,8 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
     @Query(" select a from Auction a where (a.fromTime <= :toTime and a.toTime >= :toTime)" +
             " or (a.fromTime <= :fromTime and a.toTime >= :fromTime ) " +
-            " or (a.fromTime >= :fromTime and a.toTime <= :toTime ) and a.ebayItem.id = :#{#ebayItem.id} ")
+            " or (a.fromTime >= :fromTime and a.toTime <= :toTime )" +
+            " and a.ebayItem.id = :#{#ebayItem.id} ")
     List<Auction> findOverlapping(@Param(value = "fromTime") LocalDateTime fromTime,
                                   @Param(value = "toTime") LocalDateTime toTime,
                                   @Param(value = "ebayItem") EbayItem ebayItem);

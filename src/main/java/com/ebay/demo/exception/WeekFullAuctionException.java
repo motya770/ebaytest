@@ -6,3 +6,4 @@ public class WeekFullAuctionException extends AuctionException{
         super(message);
     }
 }
+

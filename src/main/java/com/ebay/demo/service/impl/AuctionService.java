@@ -70,7 +70,7 @@ public class AuctionService implements IAuctionService {
         }
 
         if(fromTime.getDayOfWeek() == DayOfWeek.MONDAY || toTime.getDayOfWeek() == DayOfWeek.MONDAY){
-            throw new AuctionException("Can't create auction: No auctions on Mondays. ItemId " + auction.getEbayItem().getId());
+            throw new DayFullAuctionException("Can't create auction: No auctions on Mondays. ItemId " + auction.getEbayItem().getId());
         }
 
         if(fromTime.getHour() >= 23 || toTime.getHour()<=8){
