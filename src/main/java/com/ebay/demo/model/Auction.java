@@ -1,5 +1,6 @@
 package com.ebay.demo.model;
 
+import com.ebay.demo.utils.Utils;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -14,13 +15,21 @@ public class Auction {
     private Long id;
 
     @Column
-    private LocalDateTime fromTime;
+    private Long fromTime;
 
     @Column
-    private LocalDateTime toTime;
+    private Long toTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private EbayItem ebayItem;
+
+    public LocalDateTime getLocalFromTime(){
+        return Utils.localDateTimeFromMill(fromTime);
+    }
+
+    public LocalDateTime getLocalToTime(){
+        return Utils.localDateTimeFromMill(toTime);
+    }
 }
 
 

@@ -15,14 +15,14 @@ import java.util.List;
 @Repository
 public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
-
     @Query(" select a from Auction a where (a.fromTime <= :toTime and a.toTime >= :toTime)" +
             " or (a.fromTime <= :fromTime and a.toTime >= :fromTime ) " +
             " or (a.fromTime >= :fromTime and a.toTime <= :toTime )" +
             " and a.ebayItem.id = :#{#ebayItem.id} ")
-    List<Auction> findOverlapping(@Param(value = "fromTime") LocalDateTime fromTime,
-                                  @Param(value = "toTime") LocalDateTime toTime,
+    List<Auction> findOverlapping(@Param(value = "fromTime") Long fromTime,
+                                  @Param(value = "toTime") Long toTime,
                                   @Param(value = "ebayItem") EbayItem ebayItem);
+
     @Modifying
     @Query("delete from Auction a where a.ebayItem.id = :itemId")
     Auction deleteByEbayItemId(@Param(value = "itemId") String itemId);
@@ -32,13 +32,14 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
     List<Auction> deleteByFromTime(@Param(value = "fromTime") LocalDateTime fromTime);
 
     //used native query because we are using
-    @Query(nativeQuery = true,
-            value =
-            " select SUM(EXTRACT(MILLISECOND FROM a.from_time) - " +
-                    " EXTRACT(MILLISECOND FROM a.to_time)) from Auction a " +
-                    " where a.from_time >= :fromTime and a.to_time <= :toTime ")
-    Long getTotalTimeFrameSum(@Param(value = "fromTime") LocalDateTime fromTime,
-                              @Param(value = "toTime") LocalDateTime toTime);
+    @Query(value =
+            " select SUM(a.toTime - a.fromTime) from Auction a " +
+                    " where a.fromTime >= :fromTime and a.toTime <= :toTime ")
+    Long getTotalTimeFrameSum(@Param(value = "fromTime") Long fromTime,
+                              @Param(value = "toTime") Long toTime);
 
     List<Auction> findByFromTimeGreaterThanOrderByFromTimeAsc(LocalDateTime fromTime, Pageable pageable);
+
+    List<Auction> findByFromTimeAndToTimeAndEbayItem_Id(Long fromTime, Long toTime, String ebayItem_Id);
+
 }
