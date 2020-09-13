@@ -1,18 +1,18 @@
 ## program setup
 
 1) you need to git pull 3 project 
-a) ebayeuroka - discovery server 
-b) ebaydemo - auction service 
-c) ebaychecker - program that calls to auction service 
+a) ebayeuroka - discovery server https://github.com/motya770/ebayeuroka <br/>
+b) ebaydemo - auction service https://github.com/motya770/ebaytest <br/>
+c) ebaychecker - program that calls to auction service https://github.com/motya770/ebaychecker <br/>
 
 you should launch
  (each application is spring boot project - 
  you can run them in your IDE as main java program)
  those applications (because of service discovery)
 in specific order - 
-<b>a</b> - than wait 10 seconds
-<b>b</b> - than wait 10 seconds 
-<c>c<c> - this is the program that creates auctions 
+<br/><b>a</b> - than wait 10 seconds
+<br/><b>b</b> - than wait 10 seconds 
+<br/><c>c<c> - this is the program that creates auctions 
 
 ## if you want to see swagger web interface of ebaydemo
 
