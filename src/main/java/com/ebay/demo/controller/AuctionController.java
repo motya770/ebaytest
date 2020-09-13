@@ -1,9 +1,11 @@
 package com.ebay.demo.controller;
 
+import com.ebay.demo.exception.AuctionException;
 import com.ebay.demo.model.Auction;
 import com.ebay.demo.service.IAuctionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -30,9 +32,23 @@ public class AuctionController {
 
     //TODO fix and think
     @PostMapping(value = "/remove")
-    public Auction removeAuction(@RequestParam LocalDateTime fromTime,
-                                 @RequestParam String itemId) {
-        return auctionService.removeByEbayItemId(itemId);
+    public List<Auction> removeAuction(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromTime,
+                                 @RequestParam(required = false) String itemId) {
+
+        if(StringUtils.isEmpty(itemId) && fromTime==null){
+            throw new AuctionException("ItemId and fromTime can't be empty.");
+        }
+
+        if(!StringUtils.isEmpty(itemId) && fromTime!=null){
+            throw new AuctionException("ItemId and fromTime can't be together.");
+        }
+
+        if(!StringUtils.isEmpty(itemId)){
+            return auctionService.removeByEbayItemId(itemId);
+        }else {
+            return auctionService.removeByFromTime(fromTime);
+        }
     }
 
     @GetMapping(value = "/get-next")

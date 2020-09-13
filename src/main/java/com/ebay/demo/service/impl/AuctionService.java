@@ -78,7 +78,7 @@ public class AuctionService implements IAuctionService {
         checkAlreadyCreated(auction);
         checkLimitPerDay(auction);
         checkLimitPerWeek(auction);
-       // checkOverlappingTimes(auction);
+        //checkOverlappingTimes(auction);
     }
 
     private void checkAlreadyCreated(Auction auction){
@@ -104,9 +104,10 @@ public class AuctionService implements IAuctionService {
     }
 
     private void checkLimitPerWeek(Auction auction) {
-        LocalDateTime today = LocalDateTime.now();
-        LocalDateTime firstDayOfTheWeek = today.with(DayOfWeek.MONDAY);
-        LocalDateTime lastDayOfTheWeek = today.with(DayOfWeek.SUNDAY);
+
+        LocalDateTime auctionDateTime = auction.getLocalFromTime();
+        LocalDateTime firstDayOfTheWeek = auctionDateTime.with(DayOfWeek.MONDAY);
+        LocalDateTime lastDayOfTheWeek = auctionDateTime.with(DayOfWeek.SUNDAY);
         LocalDateTime lastDayOfTheWeekAndLastHour  = LocalDateTime.of(lastDayOfTheWeek.toLocalDate(), LocalTime.MAX);
 
         Long millTotalForWeekSum = auctionRepository
@@ -142,13 +143,20 @@ public class AuctionService implements IAuctionService {
     }
 
     @Override
-    public Auction removeByEbayItemId(String itemId) {
-        return auctionRepository.deleteByEbayItemId(itemId);
+    public List<Auction> removeByEbayItemId(String itemId) {
+        List<Auction> auctions =  auctionRepository.selectByEbayItemId(itemId);
+        return delete(auctions);
+    }
+
+    private List<Auction> delete(List<Auction> auctions){
+        auctionRepository.deleteAll(auctions);
+        return auctions;
     }
 
     @Override
     public List<Auction> removeByFromTime(LocalDateTime fromTime) {
-        return auctionRepository.deleteByFromTime(fromTime);
+        List<Auction> auctions = auctionRepository.selectByFromTime(fromTime);
+        return delete(auctions);
     }
 
     @Override

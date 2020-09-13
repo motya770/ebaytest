@@ -23,13 +23,12 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
                                   @Param(value = "toTime") Long toTime,
                                   @Param(value = "ebayItem") EbayItem ebayItem);
 
-    @Modifying
-    @Query("delete from Auction a where a.ebayItem.id = :itemId")
-    Auction deleteByEbayItemId(@Param(value = "itemId") String itemId);
 
-    @Modifying
-    @Query("delete from Auction a where a.ebayItem.id = :fromTime")
-    List<Auction> deleteByFromTime(@Param(value = "fromTime") LocalDateTime fromTime);
+    @Query("select a from Auction a where a.ebayItem.id = :itemId")
+    List<Auction> selectByEbayItemId(@Param(value = "itemId") String itemId);
+
+    @Query("delete a from Auction a where a.ebayItem.id = :fromTime")
+    List<Auction> selectByFromTime(@Param(value = "fromTime") LocalDateTime fromTime);
 
     //used native query because we are using
     @Query(value =

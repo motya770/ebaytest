@@ -12,7 +12,7 @@ public interface IAuctionService {
 
     List<Auction> removeByFromTime(LocalDateTime fromTime);
 
-    Auction removeByEbayItemId(String itemId);
+    List<Auction> removeByEbayItemId(String itemId);
 
     Auction createAuction(LocalDateTime fromTime, LocalDateTime toTime, String itemId);
 
